@@ -1,38 +1,44 @@
-# Crypto Hunting App
+# Crypto Hunting - MERN Stack Web App
 
-# Live App : [Crypto Hunting](https://crypto-8ddf7.firebaseapp.com/)
+![Crypto Hunting Logo](/client/public/logo.png)
 
-# Crypto Hunting
+Crypto Hunting is a full-stack web application for tracking and analyzing cryptocurrency data. This project is built using the MERN (MongoDB, Express.js, React, Node.js) stack.
 
-![Crypto Hunting Logo](<Add your logo/image URL here>)
+## Table of Contents
 
-Crypto Hunting is a cryptocurrency price tracking and analysis tool built to help crypto enthusiasts stay up-to-date with the latest market trends and make informed investment decisions. It provides real-time price data, historical charts, news updates, and more for a wide range of cryptocurrencies.
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Technologies](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- Real-time cryptocurrency price tracking
-- Historical price charts with customizable time frames
-- News aggregator for the latest cryptocurrency news
-- Portfolio management to track your crypto investments
-- Price alerts to notify you of significant price changes
-- User-friendly interface for easy navigation
+- **User Authentication**: User registration and login functionality with JWT authentication.
+- **Cryptocurrency Data**: Display real-time cryptocurrency data including prices, charts, and historical data.
+- **Favorites**: Users can add cryptocurrencies to their favorites list.
+- **News Section**: Display the latest news related to cryptocurrencies.
+- **User Profiles**: Users can create and manage their profiles.
+- **Responsive Design**: A mobile-friendly interface for easy access on various devices.
 
 ## Getting Started
 
-To get started with Crypto Hunting, follow these steps:
+To get the project up and running on your local machine, follow these steps:
 
-1. Clone the repository to your local machine:
+### Prerequisites
 
+- Node.js and npm installed on your development machine.
+- MongoDB installed locally or accessible via a cloud-based MongoDB service.
+- API keys (if required for external services).
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
    git clone https://github.com/kumarAmar882/crypto_hunting.git
-   
-3. Install the required dependencies:
    cd crypto_hunting
-   npm install
-   
-4. Start the development server:
-
-    npm start
-
-
-
-
+2.
