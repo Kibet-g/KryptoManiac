@@ -65,8 +65,8 @@ To get the project up and running on your local machine, follow these steps:
 6. The app should now be running at http://localhost:3000.
 
 ### Usage
--Register or log in to your account.
--Explore cryptocurrency data, add favorites, and stay updated with the latest news.
+- Register or log in to your account.
+- Explore cryptocurrency data, add favorites, and stay updated with the latest news.
 
 ### Technologies Used
 
