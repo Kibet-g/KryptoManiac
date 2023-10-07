@@ -70,7 +70,7 @@ To get the project up and running on your local machine, follow these steps:
 
 ### Technologies Used
 
-** Frontend:**
+**Frontend:**
 
 - React (create-react-app)
 - Redux for state management
