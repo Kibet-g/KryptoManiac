@@ -9,7 +9,10 @@
 
 ### Demo
 
-https://github.com/kumarAmar882/crypto_hunting/assets/65217388/f6e1b7e3-0e4d-4208-b887-489fdcbf0463
+
+https://github.com/kumarAmar882/crypto_hunting/assets/65217388/bcbf0539-d3d6-4ed8-898a-14cfab999030
+
+
 
 
 
