@@ -7,6 +7,11 @@
   **Crypto Hunter is a full-stack web application for tracking and analyzing cryptocurrency data. This project is built using the MERN (MongoDB, Express.js, React, Node.js) stack.**
 
 
+### Demo
+
+[![Video Title](https://img.youtube.com/vi/EiaMEExfiv8/0.jpg)](https://www.youtube.com/watch?v=EiaMEExfiv8)
+
+
 
 ## Features
 
