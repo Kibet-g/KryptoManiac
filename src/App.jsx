@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
 import Home from './pages/Home/Home';
-import Coin from './pages/Coin/Coin';
+import Coin from './pages/Home/Coin/Coin.jsx';
 
 
 const App = () => {
