@@ -1,58 +1,50 @@
-import React, { useContext } from 'react'
-import './Navbar.css'
-import logo from '../../assets/logo.png'
-import { CoinContext } from '../../context/CoinContext'
-import { Link } from 'react-router-dom'
+import React, { useContext } from 'react';
+import './Navbar.css';
+import logo from '../../assets/logo.png';
+import { CoinContext } from '../../context/CoinContext';
+import { Link } from 'react-router-dom';
 
 const NavBar = () => {
+  const { setCurrency } = useContext(CoinContext);
 
-  const {setCurrency} = useContext(CoinContext)
-  
-  const currencyHandler = (event)=>{
-    switch (event.target.value){
+  const currencyHandler = (event) => {
+    switch (event.target.value) {
       case "usd": {
-        setCurrency({name: "usd", Symbol: "$"});
+        setCurrency({ name: "usd", symbol: "$" });
         break;
       }
       case "eur": {
-        setCurrency({name: "eur", Symbol: "€"});
+        setCurrency({ name: "eur", symbol: "€" });
         break;
       }
-      case "inr": {
-        setCurrency({name: "inr", Symbol: "₹"});
-        break;
-      }
-      default : {
-        setCurrency({name: "usd", Symbol: "$"});
+      default: {
+        setCurrency({ name: "usd", symbol: "$" });
         break;
       }
     }
-
-  }
-
-
+  };
 
   return (
     <div className='navbar'>
       <Link to={'/'}>
-        <img src={logo} alt="" className='logo'/>
+        <img src={logo} alt="" className='logo' />
       </Link>
 
-        <ul>
-        <Link to={'/'}> <li>Home</li> </Link>
-            <li>Features</li>
-            <li>Pricing</li>
-            <li>Blog</li>
-        </ul>
-        
-        <div className="nav-right">
-            <select onChange={currencyHandler}>
-                <option value="usd">USD</option>
-                <option value="eur">EUR</option>
-            </select>
-        </div>      
-    </div>
-  )
-}
+      <ul>
+        <Link to={'/'}><li>Home</li></Link>
+        <li>Features</li>
+        <li>Pricing</li>
+        <li>Blog</li>
+      </ul>
 
-export default NavBar
+      <div className="nav-right">
+        <select onChange={currencyHandler}>
+          <option value="usd">USD</option>
+          <option value="eur">EUR</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
+export default NavBar;

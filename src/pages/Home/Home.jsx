@@ -1,95 +1,94 @@
-import React, { useContext, useEffect, useState } from 'react';
-import './Home.css';
+import React, { useContext, useState } from 'react';
 import { CoinContext } from '../../context/CoinContext';
+import './Home.css';
 
 const Home = () => {
-  const { allCoin } = useContext(CoinContext); 
-  const [displayCoin, setDisplayCoin] = useState([]);
-  const [input, setInput] = useState('');
+  const { allCoin, currency } = useContext(CoinContext);
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const coinsPerPage = 10; // Number of coins per page
+  const coinsPerPage = 10;
 
-  // Get the current coins for the page
-  const indexOfLastCoin = currentPage * coinsPerPage;
-  const indexOfFirstCoin = indexOfLastCoin - coinsPerPage;
-  const currentCoins = displayCoin.slice(indexOfFirstCoin, indexOfLastCoin);
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
-  const inputHandler = (event) => {
-    setInput(event.target.value);
-    if (event.target.value === "") {
-      setDisplayCoin(allCoin);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    console.log('Searching for: ', searchQuery);
+  };
+
+  const filteredCoins = allCoin.filter(coin =>
+    coin.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCoins.length / coinsPerPage);
+  const startIndex = (currentPage - 1) * coinsPerPage;
+  const currentCoins = filteredCoins.slice(startIndex, startIndex + coinsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  const searchHandler = async (event) => {
-    event.preventDefault();
-    const coins = await allCoin.filter((item) => {
-      return item.name.toLowerCase().includes(input.toLowerCase());
-    });
-    setDisplayCoin(coins);
-    setCurrentPage(1); // Reset to first page on search
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
-
-  const nextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const prevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  useEffect(() => {
-    setDisplayCoin(allCoin);
-  }, [allCoin]);
 
   return (
-    <div className='home'>
-      <div className='hero'>
-        <h1>Krypto Maniac <br/> The Crypto Marketplace</h1>
-        <p>
-          Welcome to Krypto Maniac, the best place to check on your market prices.
-        </p>
-        <form onSubmit={searchHandler}>
-          <input 
-            onChange={inputHandler} 
-            list='coinlist' 
-            value={input} 
-            type="text" 
-            placeholder='Search crypto..' 
-            required 
-          />
-          <button type="submit">Search</button>
-        </form>
-      </div>
-      <div className="crypto-table">
-        <div className="table-layout">
-          <p>#</p>
-          <p>Coins</p>
-          <p>Price</p>
-          <p style={{textAlign: "center"}}>24H Change</p>
-          <p className='market-cap'>Market Cap</p>
+    <div className="home">
+      <div className="bubble-background">
+        <div className="hero">
+          {/* Search Form */}
+          <form onSubmit={handleSearchSubmit}>
+            <input 
+              type="text" 
+              placeholder="Search for a coin..." 
+              value={searchQuery} 
+              onChange={handleSearchChange} 
+            />
+            <button type="submit">Search</button>
+          </form>
         </div>
-        {
-          currentCoins.map((coin, index) => (
-            <div className="table-layout" key={coin.id}>
-              <p>{indexOfFirstCoin + index + 1}</p>
-              <p>{coin.name}</p>
-              <p>{coin.current_price}</p>
-              <p style={{ textAlign: "center" }}>{coin.price_change_percentage_24h}%</p>
-              <p className='market-cap'>{coin.market_cap}</p>
-            </div>
-          ))
-        }
-      </div>
 
-      {/* Pagination Buttons */}
-      <div className="pagination">
-        <button onClick={prevPage} disabled={currentPage === 1}>
-          Previous
-        </button>
-        <button onClick={nextPage} disabled={indexOfLastCoin >= displayCoin.length}>
-          Next
-        </button>
+        <div className="crypto-table">
+          {/* Table Header */}
+          <div className="table-layout">
+            <p>#</p>
+            <p>Coin</p>
+            <p>Price ({currency.symbol})</p>
+            <p>24h Change</p>
+            <p>Market Cap</p>
+          </div>
+
+          {/* Table Content - paginated */}
+          {currentCoins.map((coin, index) => (
+            <div className="table-layout" key={coin.id}>
+              <p>{startIndex + index + 1}</p>
+              <div>
+                <img src={coin.image} alt={coin.name} />
+                <p>{coin.name}</p>
+              </div>
+              <p>{currency.symbol}{coin.current_price.toLocaleString()}</p>
+              <p className={coin.price_change_percentage_24h > 0 ? 'green' : 'red'}>
+                {coin.price_change_percentage_24h.toFixed(2)}%
+              </p>
+              <p className="market-cap">
+                {currency.symbol}{coin.market_cap.toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="pagination">
+          <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+          <p>Page {currentPage} of {totalPages}</p>
+          <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+        </div>
       </div>
     </div>
   );
