@@ -1,26 +1,58 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
+import { CoinContext } from '../../context/CoinContext'
+import { Link } from 'react-router-dom'
 
-const Navbar = () => {
+const NavBar = () => {
+
+  const {setCurrency} = useContext(CoinContext)
+  
+  const currencyHandler = (event)=>{
+    switch (event.target.value){
+      case "usd": {
+        setCurrency({name: "usd", Symbol: "$"});
+        break;
+      }
+      case "eur": {
+        setCurrency({name: "eur", Symbol: "€"});
+        break;
+      }
+      case "inr": {
+        setCurrency({name: "inr", Symbol: "₹"});
+        break;
+      }
+      default : {
+        setCurrency({name: "usd", Symbol: "$"});
+        break;
+      }
+    }
+
+  }
+
+
+
   return (
     <div className='navbar'>
+      <Link to={'/'}>
         <img src={logo} alt="" className='logo'/>
+      </Link>
+
         <ul>
-            <li>Home</li>
+        <Link to={'/'}> <li>Home</li> </Link>
             <li>Features</li>
-            <li>Guide</li>
-            
+            <li>Pricing</li>
+            <li>Blog</li>
         </ul>
-        <div clasName="nav-right">
-            <select>
+        
+        <div className="nav-right">
+            <select onChange={currencyHandler}>
                 <option value="usd">USD</option>
                 <option value="eur">EUR</option>
-                <option value="ksh">KSH</option>
             </select>
-        </div>
+        </div>      
     </div>
   )
 }
 
-export default Navbar
+export default NavBar
