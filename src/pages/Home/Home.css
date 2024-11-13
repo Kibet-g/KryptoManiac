@@ -77,7 +77,12 @@
     font-weight: bold;
     background-color: rgba(0, 0, 0, 0.1);
 }
- 
+
+.table-layout:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
 .table-layout p {
     margin: 0;
     padding: 10px 0;
