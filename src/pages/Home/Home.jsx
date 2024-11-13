@@ -3,13 +3,17 @@ import './Home.css';
 import { CoinContext } from '../../context/CoinContext';
 
 const Home = () => {
-  const { allCoin } = useContext(CoinContext);
+  const { allCoin } = useContext(CoinContext); 
   const [displayCoin, setDisplayCoin] = useState([]);
   const [input, setInput] = useState('');
-  const [currentPage, setCurrentPage] = useState(1); // State for current page
-  const itemsPerPage = 10; // Limit to 10 items per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const coinsPerPage = 10; // Number of coins per page
 
-  // Function to handle input change
+  // Get the current coins for the page
+  const indexOfLastCoin = currentPage * coinsPerPage;
+  const indexOfFirstCoin = indexOfLastCoin - coinsPerPage;
+  const currentCoins = displayCoin.slice(indexOfFirstCoin, indexOfLastCoin);
+
   const inputHandler = (event) => {
     setInput(event.target.value);
     if (event.target.value === "") {
@@ -17,34 +21,21 @@ const Home = () => {
     }
   };
 
-  // Function to handle search
   const searchHandler = async (event) => {
     event.preventDefault();
     const coins = await allCoin.filter((item) => {
       return item.name.toLowerCase().includes(input.toLowerCase());
     });
     setDisplayCoin(coins);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1); // Reset to first page on search
   };
 
-  // Update displayed coins based on current page
-  const currentCoins = displayCoin.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Go to the next page
   const nextPage = () => {
-    if (currentPage < Math.ceil(displayCoin.length / itemsPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
+    setCurrentPage((prevPage) => prevPage + 1);
   };
 
-  // Go to the previous page
   const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    setCurrentPage((prevPage) => prevPage - 1);
   };
 
   useEffect(() => {
@@ -54,16 +45,18 @@ const Home = () => {
   return (
     <div className='home'>
       <div className='hero'>
-        <h1>Krypto Maniac <br /> The Crypto Marketplace</h1>
-        <p>Welcome to Krypto Maniac, the best place to check on your market prices.</p>
+        <h1>Krypto Maniac <br/> The Crypto Marketplace</h1>
+        <p>
+          Welcome to Krypto Maniac, the best place to check on your market prices.
+        </p>
         <form onSubmit={searchHandler}>
-          <input
-            onChange={inputHandler}
-            list='coinlist'
-            value={input}
-            type="text"
-            placeholder='Search crypto..'
-            required
+          <input 
+            onChange={inputHandler} 
+            list='coinlist' 
+            value={input} 
+            type="text" 
+            placeholder='Search crypto..' 
+            required 
           />
           <button type="submit">Search</button>
         </form>
@@ -73,13 +66,13 @@ const Home = () => {
           <p>#</p>
           <p>Coins</p>
           <p>Price</p>
-          <p style={{ textAlign: "center" }}>24H Change</p>
+          <p style={{textAlign: "center"}}>24H Change</p>
           <p className='market-cap'>Market Cap</p>
         </div>
         {
           currentCoins.map((coin, index) => (
             <div className="table-layout" key={coin.id}>
-              <p>{(currentPage - 1) * itemsPerPage + index + 1}</p>
+              <p>{indexOfFirstCoin + index + 1}</p>
               <p>{coin.name}</p>
               <p>{coin.current_price}</p>
               <p style={{ textAlign: "center" }}>{coin.price_change_percentage_24h}%</p>
@@ -87,11 +80,16 @@ const Home = () => {
             </div>
           ))
         }
-        <div className="pagination">
-          <button onClick={prevPage} disabled={currentPage === 1}>Previous</button>
-          <span>Page {currentPage}</span>
-          <button onClick={nextPage} disabled={currentPage === Math.ceil(displayCoin.length / itemsPerPage)}>Next</button>
-        </div>
+      </div>
+
+      {/* Pagination Buttons */}
+      <div className="pagination">
+        <button onClick={prevPage} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <button onClick={nextPage} disabled={indexOfLastCoin >= displayCoin.length}>
+          Next
+        </button>
       </div>
     </div>
   );
