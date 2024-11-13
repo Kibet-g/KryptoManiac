@@ -1,28 +1,27 @@
-import React, { useEffect, useState} from 'react'
-import Chart from 'react-google-charts'
+import React, { useEffect, useState } from 'react';
+import Chart from 'react-google-charts';
 
-const LineChart = ({historicalData}) => {
+const LineChart = ({ historicalData }) => {
+  const [data, setData] = useState([["Date", "Prices"]]);
 
-const [data, setData] = useState((["Date", "Prices"]))
-
-useEffect(()=>{
-  let dataCopy = [["Date","Prices"]];
-  if(historicalData.prices){
-    historicalData.prices.map((item)=>{
-      dataCopy.push([`${new Date(item[0]).toLocaleDateString().slice(0,-5)}`, item[1]])
-    })
-    setData(dataCopy);
-  }
-},[historicalData])
+  useEffect(() => {
+    let dataCopy = [["Date", "Prices"]];
+    if (historicalData && historicalData.prices) {
+      historicalData.prices.map((item) => {
+        return dataCopy.push([`${new Date(item[0]).toLocaleDateString().slice(0, -5)}`, item[1]]);
+      });
+      setData(dataCopy);
+    }
+  }, [historicalData]);
 
   return (
     <Chart
-    chartType='LineChart'
-    data={data}
-    height="100%"
-    legentToggle
+      chartType="LineChart"
+      data={data}
+      height="100%"
+      legendToggle
     />
-  )
-}
+  );
+};
 
-export default LineChart
+export default LineChart;
