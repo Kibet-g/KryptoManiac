@@ -1,5 +1,4 @@
 SCREENSHOTS 
-![image alt](https://github.com/Kibet-g/KryptoManiac/blob/42ef308d9906275380cf6da361baeced7a1971c4/Screenshot%202024-11-15%20134059.png)
 ![image alt](https://github.com/Kibet-g/KryptoManiac/blob/42ef308d9906275380cf6da361baeced7a1971c4/Screenshot%202024-11-15%20134109.png)
 ![image alt](https://github.com/Kibet-g/KryptoManiac/blob/42ef308d9906275380cf6da361baeced7a1971c4/Screenshot%202024-11-15%20134123.png)
 # Getting Started with Create React App
