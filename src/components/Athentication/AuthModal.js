@@ -65,8 +65,8 @@ export default function AuthModal() {
     }).catch((error) => {
       setAlert({
         open: true,
-        message: error.message,
-        type: error,
+        message: error.message || "Something went wrong during login",
+        type: "error",
       })
     })
   }

@@ -157,10 +157,13 @@ const MarketGlobe = ({ coins = [] }) => {
 
   useEffect(() => {
     let renderer, scene, camera, globe, particles = [];
+    let isMounted = true;
     
     const init = async () => {
       try {
         const THREE = await import('three');
+        if (!isMounted) return; // Prevent async race condition
+
         setThreeLoaded(true);
 
         if (!containerRef.current || !canvasRef.current) return;
@@ -238,6 +241,8 @@ const MarketGlobe = ({ coins = [] }) => {
 
         let time = 0;
         const animate = () => {
+          if (!isMounted || !renderer) return;
+
           time += 0.005;
           
           if (globe) globe.rotation.y += 0.001;
@@ -266,15 +271,33 @@ const MarketGlobe = ({ coins = [] }) => {
 
       } catch (err) {
         console.error('Three.js failed', err);
-        setThreeLoaded(false);
+        if (isMounted) setThreeLoaded(false);
       }
     };
 
     init();
 
     return () => {
+      isMounted = false;
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      if (renderer) renderer.dispose();
+      if (renderer) {
+        renderer.dispose();
+        // Clean up scene to avoid WebGL context warnings
+        if (scene) {
+          scene.traverse((object) => {
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+              if (object.material.length) {
+                 for (let i = 0; i < object.material.length; ++i) {
+                   object.material[i].dispose();
+                 }
+              } else {
+                 object.material.dispose();
+              }
+            }
+          });
+        }
+      }
     };
   }, [coins, displayCoins]);
 
