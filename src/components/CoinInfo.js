@@ -22,6 +22,7 @@ import {
 import { chartDays } from '../config/data';
 import SelectButton from './SelectButton';
 import GlassCard from './ui/GlassCard';
+import { getMockHistory } from '../config/mockData';
 
 // AI Trading Guardian Components
 import PredictionCard from './PredictionCard';
@@ -40,7 +41,7 @@ ChartJS.register(
   Filler
 );
 
-import { getMockHistory } from '../config/mockData';
+
 
 const useStyles = makeStyles((theme) => ({
 // ... 
