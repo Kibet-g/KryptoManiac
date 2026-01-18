@@ -40,63 +40,10 @@ ChartJS.register(
   Filler
 );
 
+import { getMockHistory } from '../config/mockData';
+
 const useStyles = makeStyles((theme) => ({
-  container: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    gap: 30,
-    [theme.breakpoints.down("md")]: {
-      padding: 0,
-    },
-  },
-  chartContainer: {
-    padding: 30,
-    width: "100%",
-    [theme.breakpoints.down("sm")]: {
-      padding: 15,
-    },
-  },
-  timeframeRow: {
-    display: "flex",
-    marginTop: 30,
-    justifyContent: "center",
-    gap: 12,
-    flexWrap: "wrap",
-    width: "100%",
-  },
-  aiGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 30,
-    width: "100%",
-    [theme.breakpoints.down("sm")]: {
-      gridTemplateColumns: "1fr",
-    },
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 700,
-    color: '#fff',
-    marginBottom: 20,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    '&::before': {
-      content: '""',
-      width: 4,
-      height: 24,
-      background: 'var(--accent-gradient)',
-      borderRadius: 2,
-    }
-  },
-  loaderBox: {
-    height: 400,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  }
+// ... 
 }));
 
 const CoinInfo = () => {
@@ -107,12 +54,13 @@ const CoinInfo = () => {
   const classes = useStyles();
 
   const fetchHistoricData = async () => {
-    try {
-      const { data } = await axios.get(HistoricalChart(id, days, currency));
-      sethistoricData(data.prices);
-    } catch (error) {
-      console.error("Error fetching historic data", error);
-    }
+     try {
+       const { data } = await axios.get(HistoricalChart(id, days, currency));
+       sethistoricData(data.prices);
+     } catch (error) {
+       console.error("Error fetching historic data, utilizing fallback", error);
+       sethistoricData(getMockHistory(days, currency));
+     }
   }
 
   useEffect(() => {

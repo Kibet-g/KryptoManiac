@@ -16,6 +16,7 @@ import GlassCard from '../components/ui/GlassCard';
 import PriceChange from '../components/ui/PriceChange';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
 import MarketGlobe from '../components/3d/MarketGlobe';
+import { getMockCoinDetail } from '../config/mockData';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -110,12 +111,19 @@ const Bitcoin = () => {
   const { currency, symbol, user, watchlist, setAlert } = CryptoState();
   const classes = useStyles();
 
+// ... inside Bitcoin component
   const fetchCoin = async () => {
     try {
       const { data } = await axios.get(SingleCoin(id));
       setCoin(data);
     } catch (error) {
-      console.error("Error fetching coin data", error);
+      console.error("Error fetching coin data, utilizing fallback", error);
+      setCoin(getMockCoinDetail(id));
+      setAlert({
+        open: true,
+        message: "Using offline data due to high API traffic",
+        type: "warning"
+      });
     }
   };
 

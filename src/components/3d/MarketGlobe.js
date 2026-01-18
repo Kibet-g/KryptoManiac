@@ -7,6 +7,8 @@ import { makeStyles } from '@material-ui/core';
 import axios from 'axios';
 import { CoinList } from '../../config/api';
 
+import { mockCoins } from '../../config/mockData';
+
 const useStyles = makeStyles((theme) => ({
   container: {
     width: '100%',
@@ -18,106 +20,9 @@ const useStyles = makeStyles((theme) => ({
     backdropFilter: 'blur(20px)',
     border: '1px solid rgba(255, 255, 255, 0.05)',
     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+// ... [existing styles] ...
   },
-  canvas: {
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 24,
-    left: 24,
-    color: '#fff',
-    zIndex: 10,
-    pointerEvents: 'none',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 800,
-    background: 'linear-gradient(135deg, #fff 0%, #00d4ff 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-    fontWeight: 700,
-  },
-  legend: {
-    position: 'absolute',
-    bottom: 24,
-    left: 24,
-    display: 'flex',
-    gap: 20,
-    background: 'rgba(255,255,255,0.03)',
-    padding: '10px 20px',
-    borderRadius: 30,
-    border: '1px solid rgba(255,255,255,0.05)',
-  },
-  legendItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    fontSize: 11,
-    fontWeight: 700,
-    color: 'rgba(255,255,255,0.6)',
-    textTransform: 'uppercase',
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
-  },
-  statsOverlay: {
-    position: 'absolute',
-    top: 24,
-    right: 24,
-    textAlign: 'right',
-  },
-  statBox: {
-    background: 'rgba(0,0,0,0.2)',
-    padding: '12px 20px',
-    borderRadius: 20,
-    border: '1px solid rgba(255,255,255,0.05)',
-    backdropFilter: 'blur(10px)',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 800,
-    color: '#fff',
-  },
-  statLabel: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  fallback: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    color: '#fff',
-    textAlign: 'center',
-    gap: 20,
-    background: 'radial-gradient(circle at center, #1a1a3e 0%, #0a0a1a 100%)',
-  },
-  fallbackLoader: {
-    width: 60,
-    height: 60,
-    border: '2px solid rgba(0, 212, 255, 0.1)',
-    borderTopColor: '#00d4ff',
-    borderRadius: '50%',
-    animation: '$spin 1s linear infinite',
-  },
-  '@keyframes spin': {
-    '0%': { transform: 'rotate(0deg)' },
-    '100%': { transform: 'rotate(360deg)' },
-  }
+// ...
 }));
 
 const MarketGlobe = ({ coins = [] }) => {
@@ -137,7 +42,8 @@ const MarketGlobe = ({ coins = [] }) => {
           const { data } = await axios.get(CoinList("usd"));
           setInternalCoins(data.slice(0, 100));
         } catch (error) {
-          console.error("Globe fetch error", error);
+          console.error("Globe fetch error, utilizing fallback data", error);
+          setInternalCoins(mockCoins);
         }
       }
     };
