@@ -7,7 +7,7 @@ import { makeStyles, CircularProgress } from '@material-ui/core';
 import { getPrediction, getMarketAlerts } from '../services/MLService';
 import GlassCard from './ui/GlassCard';
 
-import { CryptoState } from '../CryptoContext';
+
 
 const useStyles = makeStyles((theme) => ({
   header: {

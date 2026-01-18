@@ -143,7 +143,7 @@ const MarketGlobe = ({ coins = [] }) => {
     };
     fetchCoins();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coins, displayCoins]);
+  }, [coins]);
 
   const displayCoins = coins.length > 0 ? coins : internalCoins;
 
@@ -276,7 +276,7 @@ const MarketGlobe = ({ coins = [] }) => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       if (renderer) renderer.dispose();
     };
-  }, [coins]);
+  }, [coins, displayCoins]);
 
   return (
     <div className={classes.container} ref={containerRef}>
