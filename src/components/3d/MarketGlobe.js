@@ -143,7 +143,7 @@ const MarketGlobe = ({ coins = [] }) => {
     };
     fetchCoins();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coins]);
+  }, [coins, displayCoins]);
 
   const displayCoins = coins.length > 0 ? coins : internalCoins;
 

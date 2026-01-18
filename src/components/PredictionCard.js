@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles, CircularProgress } from '@material-ui/core';
 import { getPrediction, getMarketAlerts } from '../services/MLService';
 import GlassCard from './ui/GlassCard';
-import PriceChange from './ui/PriceChange';
+
 import { CryptoState } from '../CryptoContext';
 
 const useStyles = makeStyles((theme) => ({
@@ -149,7 +149,6 @@ const useStyles = makeStyles((theme) => ({
 
 const PredictionCard = ({ coinId, symbol }) => {
   const classes = useStyles();
-  const { currency } = CryptoState();
   const [prediction, setPrediction] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);

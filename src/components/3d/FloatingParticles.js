@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
 const FloatingParticles = ({ count = 50 }) => {
   const classes = useStyles();
   const containerRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [, setIsLoaded] = useState(false);
 
   useEffect(() => {
     let scene, camera, renderer, particles;
