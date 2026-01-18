@@ -1,5 +1,8 @@
-import { async } from '@firebase/util';
-import { Button, LinearProgress, makeStyles, Typography } from '@material-ui/core';
+/**
+ * Premium Coin Detail Page
+ * Apple-style layout with glassmorphism and animated stats
+ */
+import { Button, LinearProgress, makeStyles, Container } from '@material-ui/core';
 import axios from 'axios';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
@@ -9,204 +12,233 @@ import CoinInfo from '../components/CoinInfo';
 import { SingleCoin } from '../config/api';
 import { CryptoState } from '../CryptoContext';
 import { db } from '../firebase';
+import GlassCard from '../components/ui/GlassCard';
+import PriceChange from '../components/ui/PriceChange';
+import AnimatedCounter from '../components/ui/AnimatedCounter';
+import MarketGlobe from '../components/3d/MarketGlobe';
 
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: "flex",
+    padding: "40px 0",
+    gap: 40,
+    [theme.breakpoints.down("md")]: {
+      flexDirection: "column",
+      alignItems: "center",
+      padding: "20px",
+    },
+  },
+  sidebar: {
+    width: "35%",
+    [theme.breakpoints.down("md")]: {
+      width: "100%",
+    },
+    display: "flex",
+    flexDirection: "column",
+  },
+  coinHeader: {
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  coinImage: {
+    height: 180,
+    marginBottom: 20,
+    filter: 'drop-shadow(0 0 30px rgba(0, 212, 255, 0.3))',
+    animation: '$floating 4s ease-in-out infinite',
+  },
+  '@keyframes floating': {
+    '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+    '50%': { transform: 'translateY(-15px) rotate(5deg)' },
+  },
+  title: {
+    fontSize: 48,
+    fontWeight: 800,
+    background: 'linear-gradient(135deg, #fff 0%, #00d4ff 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    fontFamily: "'Inter', sans-serif",
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 1.7,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'justify',
+    marginBottom: 30,
+  },
+  marketData: {
+    display: 'grid',
+    gap: 16,
+  },
+  dataRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '16px 20px',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    color: 'rgba(255,255,255,0.4)',
+  },
+  value: {
+    fontSize: 18,
+    fontWeight: 700,
+    color: '#fff',
+  },
+  watchlistBtn: {
+    marginTop: 30,
+    padding: '14px',
+    borderRadius: 16,
+    fontWeight: 700,
+    textTransform: 'none',
+    fontSize: 16,
+    transition: 'all 0.3s ease',
+  },
+  mainContent: {
+    flex: 1,
+    width: '100%',
+  },
+}));
 
 const Bitcoin = () => {
-
   const { id } = useParams();
-  const [coins, setcoins] = useState();
+  const [coin, setCoin] = useState();
   const { currency, symbol, user, watchlist, setAlert } = CryptoState();
-  const fetchCoin = async () => {
-    const { data } = await axios.get(SingleCoin(id));
-    setcoins(data);
-  };
+  const classes = useStyles();
 
-  console.log(coins);
+  const fetchCoin = async () => {
+    try {
+      const { data } = await axios.get(SingleCoin(id));
+      setCoin(data);
+    } catch (error) {
+      console.error("Error fetching coin data", error);
+    }
+  };
 
   useEffect(() => {
     fetchCoin();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
-  const useStyles = makeStyles((theme) => ({
-    container: {
-      display: "flex",
-      [theme.breakpoints.down("md")]: {
-        flexDirection: "column",
-        alignItems: "center",
-      },
+  const inWatchlist = watchlist.includes(coin?.id);
 
-    },
-    sidebar: {
-      width: "30%",
-      [theme.breakpoints.down("md")]: {
-        width: "100%",
-      },
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      marginTop: 25,
-      borderRight: "2px solid grey",
-    },
-
-    heading: {
-      fontWeight: "bold",
-      marginBottom: 20,
-      fontFamily: "Montserrat",
-      color: "white"
-    },
-    description: {
-      width: "100%",
-      fontFamily: "Montserrat",
-      padding: 25,
-      paddingBottom: 15,
-      paddingTop: 0,
-      textAlign: "justify",
-
-    },
-    marketData: {
-      alignSelf: "start",
-      padding: 25,
-      paddingTop: 10,
-      width: "100%",
-      //making it responsive
-
-      [theme.breakpoints.down("sm")]: {
-        flexDirection: "column",
-        alignItems: "center",
-      },
-
-      [theme.breakpoints.down("md")]: {
-        flexDirection: "column",
-        alignItems: "center",
-      },
-      [theme.breakpoints.down("xs")]: {
-        alignItems: "start",
-      },
-
-
-    }
-
-  }))
-
-  const inWatchlist = watchlist.includes(coins?.id);
-
-  const addtowatchlist = async () => {
-    const coinref = doc(db, "watchlist", user.uid,);
-    try {
-      await setDoc(coinref, { coins: watchlist ? [...watchlist, coins?.id] : [coins?.id] });
+  const toggleWatchlist = async () => {
+    if (!user) {
       setAlert({
         open: true,
-        message: `${coins.name} Added to the Watchlist !`,
-        type: "success"
-      })
+        message: "Please login to add coins to watchlist",
+        type: "error"
+      });
+      return;
     }
-    catch (error) {
+
+    const coinref = doc(db, "watchlist", user.uid);
+    try {
+      const newWatchlist = inWatchlist 
+        ? watchlist.filter((watch) => watch !== coin?.id)
+        : [...(watchlist || []), coin?.id];
+
+      await setDoc(coinref, { coins: newWatchlist });
+      
+      setAlert({
+        open: true,
+        message: `${coin.name} ${inWatchlist ? 'Removed from' : 'Added to'} Watchlist!`,
+        type: "success"
+      });
+    } catch (error) {
       setAlert({
         open: true,
         message: error.message,
         type: "error"
-      })
+      });
     }
-  }
-  const removewatchlist = async () => {
-    const coinref = doc(db, "watchlist", user.uid,);
-    try {
-      await setDoc(coinref, { coins: watchlist.filter((watch) => watch !== coins?.id) }, { merge: "true" });
-      setAlert({
-        open: true,
-        message: `${coins.name} Remove from the Watchlist !`,
-        type: "success"
-      })
-    }
-    catch (error) {
-      setAlert({
-        open: true,
-        message: error.message,
-        type: "error"
-      })
-    }
-  }
+  };
 
-  const classes = useStyles();
-  if (!coins) return <LinearProgress style={{ backgroundColor: "#04b5e5" }}></LinearProgress>;
-
+  if (!coin) return <LinearProgress style={{ backgroundColor: "#00d4ff" }} />;
 
   return (
-    <div className={classes.container}>
+    <Container className={classes.container}>
+      {/* Sidebar - Coin Info */}
       <div className={classes.sidebar}>
-        <img
-          src={coins?.image.large}
-          alt={coins?.name}
-          height="200"
-          style={{ marginBottom: 20 }}
-        />
-        <Typography
-          variant='h3'
-          className={classes.heading}
-          style={{ color: "white" }}
-        >
-          {coins?.name}
-        </Typography>
-        <Typography variant="subtitle1" className={classes.description} style={{ color: "white" }}>
-          {coins?.description.en.split(". ")[0]}.
-        </Typography>
+        <div className={classes.coinHeader}>
+          <img
+            src={coin?.image.large}
+            alt={coin?.name}
+            className={classes.coinImage}
+          />
+          <h1 className={classes.title}>{coin?.name}</h1>
+          <PriceChange value={coin?.market_data.price_change_percentage_24h} size="large" />
+        </div>
+
+        <p className={classes.description}>
+          {coin?.description.en.split(". ")[0]}. 
+          {coin?.description.en.split(". ")[1] && coin?.description.en.split(". ")[1] + "."}
+        </p>
+
         <div className={classes.marketData}>
-          <span style={{ display: "flex" }}>
-            <Typography variant='h5' className={classes.heading}>
-              Rank:
-            </Typography>
-            &nbsp; &nbsp;
-            <Typography variant='h5' style={{ fontFamily: "Montserrat", color: "white" }}>
-              {coins?.market_cap_rank}
-            </Typography>
+          <GlassCard className={classes.dataRow} radius={16} padding={16}>
+            <span className={classes.label}>Market Rank</span>
+            <span className={classes.value}>#{coin?.market_cap_rank}</span>
+          </GlassCard>
 
-          </span>
-          <span style={{ display: "flex" }}>
-            <Typography variant='h5' className={classes.heading}>
-              Current Price:
-            </Typography>
-            &nbsp; &nbsp;
-            <Typography variant='h5' style={{ fontFamily: "Montserrat", color: "white" }}>
-              {symbol}{" "}
-              {coinWithComa(coins?.market_data.current_price[currency.toLowerCase()])}
-            </Typography>
+          <GlassCard className={classes.dataRow} radius={16} padding={16}>
+            <span className={classes.label}>Current Price</span>
+            <span className={classes.value}>
+              {symbol}{coinWithComa(coin?.market_data.current_price[currency.toLowerCase()].toFixed(2))}
+            </span>
+          </GlassCard>
 
-          </span>
-          <span style={{ display: "flex" }}>
-            <Typography variant="h5" className={classes.heading}>
-              Market Cap:{" "}
-            </Typography>
-            &nbsp; &nbsp;
-            <Typography variant="h5" style={{ fontFamily: "Montserrat", color: "white" }}>
-              {symbol}{" "}
-              {coinWithComa(coins?.market_data.market_cap[currency.toLowerCase()]
-                .toString()
-                .slice(0, -6)
-              )}M
-            </Typography>
+          <GlassCard className={classes.dataRow} radius={16} padding={16}>
+            <span className={classes.label}>Market Cap</span>
+            <span className={classes.value}>
+              {symbol}<AnimatedCounter value={coin?.market_data.market_cap[currency.toLowerCase()]} />
+            </span>
+          </GlassCard>
+        </div>
 
-          </span>
-          {user && (
-            <Button
-              variant="outlined"
-              style={{
-                width: "100%",
-                height: 40,
-                backgroundColor: inWatchlist ? "red " : "#04b5e5",
-                fontFamily: "monospace"
-              }}
-              onClick={inWatchlist ? removewatchlist : addtowatchlist}
-            >
-              {inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-            </Button>
-          )}
+        <Button
+          variant="contained"
+          className={classes.watchlistBtn}
+          style={{
+            background: inWatchlist ? 'rgba(255, 51, 102, 0.2)' : 'linear-gradient(135deg, #00d4ff 0%, #7b2dff 100%)',
+            color: inWatchlist ? '#ff3366' : '#fff',
+            border: inWatchlist ? '1px solid #ff3366' : 'none',
+          }}
+          onClick={toggleWatchlist}
+        >
+          {inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+        </Button>
+      </div>
 
+      {/* Main Content - Chart & Insights */}
+      <div className={classes.mainContent}>
+        <CoinInfo coin={coin} />
+        
+        {/* Market Globe for Sentiment Context */}
+        <div style={{ marginTop: 60 }}>
+          <h2 style={{ 
+            fontSize: 24, 
+            fontWeight: 800, 
+            marginBottom: 30,
+            background: 'linear-gradient(135deg, #fff 0%, #00d4ff 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 15
+          }}>
+            <span style={{ fontSize: 32 }}>🌐</span> Global Market Context
+          </h2>
+          <MarketGlobe />
         </div>
       </div>
-      <CoinInfo> coin = {coins}</CoinInfo>
-
-    </div>
+    </Container>
   );
 };
 
 export default Bitcoin;
+

@@ -1,10 +1,13 @@
+/**
+ * Premium CoinInfo Component
+ * Integrates interactive charts with AI Trading Guardian insights
+ */
 import { CircularProgress, createTheme, makeStyles, ThemeProvider } from '@material-ui/core';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { HistoricalChart } from '../config/api';
 import { CryptoState } from '../CryptoContext';
-import {Line} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,9 +17,17 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from 'chart.js';
 import { chartDays } from '../config/data';
 import SelectButton from './SelectButton';
+import GlassCard from './ui/GlassCard';
+
+// AI Trading Guardian Components
+import PredictionCard from './PredictionCard';
+import PredictionChart from './PredictionChart';
+import LivePriceTicker from './LivePriceTicker';
+import WhaleAlert from './WhaleAlert';
 
 ChartJS.register(
   CategoryScale,
@@ -25,114 +36,156 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
+const useStyles = makeStyles((theme) => ({
+  container: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 30,
+    [theme.breakpoints.down("md")]: {
+      padding: 0,
+    },
+  },
+  chartContainer: {
+    padding: 30,
+    width: "100%",
+    [theme.breakpoints.down("sm")]: {
+      padding: 15,
+    },
+  },
+  timeframeRow: {
+    display: "flex",
+    marginTop: 30,
+    justifyContent: "center",
+    gap: 12,
+    flexWrap: "wrap",
+    width: "100%",
+  },
+  aiGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 30,
+    width: "100%",
+    [theme.breakpoints.down("sm")]: {
+      gridTemplateColumns: "1fr",
+    },
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 700,
+    color: '#fff',
+    marginBottom: 20,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    '&::before': {
+      content: '""',
+      width: 4,
+      height: 24,
+      background: 'var(--accent-gradient)',
+      borderRadius: 2,
+    }
+  },
+  loaderBox: {
+    height: 400,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  }
+}));
 
 const CoinInfo = () => {
-  const {id} = useParams();
- const [historicData,sethistoricData]  = useState();
- const [days,setDays] =  useState(1);
- const {currency} = CryptoState();
- const  fetchHistoricData = async()=>{
-   const {data} = await axios.get(HistoricalChart(id, days,currency));
-   console.log(data.prices);
-   sethistoricData(data.prices);
-  
- }
+  const { id } = useParams();
+  const [historicData, sethistoricData] = useState();
+  const [days, setDays] = useState(1);
+  const { currency } = CryptoState();
+  const classes = useStyles();
 
- 
- useEffect(()=>{
-   fetchHistoricData();
- },[currency,days])
-
- const darkTheme = createTheme({
-  palette:{
-    primary:{
-      main:"#fff"
-    },
-    type:"dark",
-  }
-});
-
-const useStyles = makeStyles((theme)=>({
-  container:{
-    width:"75%",
-    display:"flex",
-    flexDirection:"column",
-    alignItems:"center",
-    justifyContent:"center",
-    marginTop:25,
-    padding:40,
-    [theme.breakpoints.down("md")]:{
-      width:"100%",
-      marginTop:0,
-      padding:20,
-      paddingTop:0,
-    },
+  const fetchHistoricData = async () => {
+    try {
+      const { data } = await axios.get(HistoricalChart(id, days, currency));
+      sethistoricData(data.prices);
+    } catch (error) {
+      console.error("Error fetching historic data", error);
+    }
   }
 
-}))
+  useEffect(() => {
+    fetchHistoricData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currency, days, id]);
 
-const classes = useStyles();
+  const darkTheme = createTheme({
+    palette: {
+      primary: { main: "#00d4ff" },
+      type: "dark",
+    },
+  });
+
   return (
-   <ThemeProvider theme={darkTheme}>
-   <div className={classes.container}>
-   {/*charts*/}
-   {
-     !historicData ? (
-       <CircularProgress
-         style={{color:"#04b5e5"}}
-         size={250}
-         thickness={1}
-       />
-     ):(
-       <>
-         <Line
-           data={{
-             labels:historicData.map((coin)=>{
-               let date = new Date(coin[0]);
-               let time = date.getHours()>12?`${date.getHours()-12}:${date.getMinutes()}PM`
-               : `${date.getHours()}:${date.getMinutes()}AM`;
+    <ThemeProvider theme={darkTheme}>
+      <div className={classes.container}>
+        
+        {/* Live Market Pulse Header */}
+        <LivePriceTicker symbol={id} />
 
-               return days === 1? time:date.toLocaleDateString();
-             }),
-             datasets:[{
-               data:historicData.map((coin)=>coin[1]),
-               label:`Price(Past ${days} Days) in ${currency}`,
-               borderColor:"#04b5e5",
-             }],
-           }}
-           options={{
-             elements:{
-               point:{
-                 radius:1,
-               },
-             }
-           }}
-         />
-         <div style={{
-           display:"flex",
-           marginTop:20,
-           justifyContent:"space-around",
-           width:"100%",
-         }}>
-           {chartDays.map(day=>(
-             <SelectButton onClick={()=>setDays(day.value)}  selected={day.value==days}>{day.label}</SelectButton>
-           ))}
-         </div>
-       </>
-     )
-   }
+        {/* Technical Analysis Chart */}
+        <GlassCard className={classes.chartContainer} radius={32}>
+          <div className={classes.sectionTitle}>
+            Market Performance
+          </div>
+          
+          {!historicData ? (
+            <div className={classes.loaderBox}>
+              <CircularProgress style={{ color: "#00d4ff" }} size={100} thickness={2} />
+            </div>
+          ) : (
+            <>
+              <PredictionChart 
+                historicData={historicData}
+                symbol={id}
+                days={days}
+                currency={currency}
+              />
+              <div className={classes.timeframeRow}>
+                {chartDays.map(day => (
+                  <SelectButton 
+                    key={day.value}
+                    onClick={() => setDays(day.value)}  
+                    selected={day.value === days}
+                  >
+                    {day.label}
+                  </SelectButton>
+                ))}
+              </div>
+            </>
+          )}
+        </GlassCard>
 
-
-
-   {/*buttons*/}
-   </div>
-
-
-   </ThemeProvider>
+        {/* AI Trading Guardian Insights */}
+        <div className={classes.aiGrid}>
+          {/* AI Signals Card */}
+          <div>
+            <div className={classes.sectionTitle}>AI Prediction Engine</div>
+            <PredictionCard coinId={id} symbol={id?.toUpperCase()} />
+          </div>
+          
+          {/* Whale Activity Card */}
+          <div>
+            <div className={classes.sectionTitle}>Blockchain Intelligence</div>
+            <WhaleAlert symbol={id} />
+          </div>
+        </div>
+      </div>
+    </ThemeProvider>
   )
 }
 
-export default CoinInfo
+export default CoinInfo;
+
+

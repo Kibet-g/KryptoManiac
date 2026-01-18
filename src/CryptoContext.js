@@ -5,10 +5,15 @@ import React, { createContext, useEffect, useState } from 'react';
 import { useContext } from 'react';
 import { CoinList } from './config/api';
 import { auth, db } from './firebase';
+import { getSymbolByCode } from './config/currencies';
+
 const Crypto = createContext();
+
 const CryptoContext = ({ children }) => {
-   const [currency, setCurrency] = useState('INR');
-   const [symbol, setSymbol] = useState("₹");
+   // Load saved currency or default to USD
+   const savedCurrency = localStorage.getItem('cryptoManiac_currency') || 'USD';
+   const [currency, setCurrency] = useState(savedCurrency);
+   const [symbol, setSymbol] = useState(getSymbolByCode(savedCurrency));
    const [coins, setCoins] = useState([]);
    const [loading, setLoading] = useState(false);
    const [user, setUser] = useState(null);
@@ -43,17 +48,18 @@ const CryptoContext = ({ children }) => {
          console.log(user);
       })
    })
+
    const fetchCoins = async () => {
       setLoading(true);
       const { data } = await axios.get(CoinList(currency));
       setCoins(data);
       setLoading(false);
-
    }
-   useEffect(() => {
 
-      if (currency === "INR") setSymbol("₹");
-      else if (currency === "USD") setSymbol("$");
+   // Update symbol whenever currency changes
+   useEffect(() => {
+      setSymbol(getSymbolByCode(currency));
+      localStorage.setItem('cryptoManiac_currency', currency);
    }, [currency]);
 
 
