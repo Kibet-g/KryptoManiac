@@ -11,6 +11,7 @@ import AliceCarousel from 'react-alice-carousel';
 import { Link } from 'react-router-dom';
 import GlassCard from '../ui/GlassCard';
 import PriceChange from '../ui/PriceChange';
+import { mockCoins } from '../../config/mockData';
 
 const useStyles = makeStyles((theme) => ({
   carousel: {
@@ -71,7 +72,8 @@ const Corousels = () => {
       const { data } = await axios.get(TrendingCoins(currency));
       setTrending(data);
     } catch (error) {
-      console.error("Error fetching trending coins", error);
+      console.error("Error fetching trending coins, using fallback", error);
+      setTrending(mockCoins.slice(0, 10)); // Use mock data as fallback
     }
   }
 

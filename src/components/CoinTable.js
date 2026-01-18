@@ -14,6 +14,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { CoinList } from '../config/api';
+import { mockCoins } from '../config/mockData';
 import { CryptoState } from '../CryptoContext';
 import GlassCard from './ui/GlassCard';
 import PriceChange from './ui/PriceChange';
@@ -225,6 +226,11 @@ const CoinTable = () => {
       }
     } catch (error) {
       console.error('Error fetching coins:', error);
+      // Use fallback data and stop infinite scroll on first page
+      if (pageNum === 1) {
+        setCoins(mockCoins);
+      }
+      setHasMore(false); // Stop trying to load more
     } finally {
       setLoading(false);
     }
