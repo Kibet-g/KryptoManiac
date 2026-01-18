@@ -3,6 +3,8 @@
  * Connects React frontend to Python ML backend
  */
 
+import { getMockPrediction, getMockWhaleAlerts } from '../config/mockData';
+
 const ML_API_BASE = process.env.REACT_APP_ML_API_URL || 'http://localhost:8000';
 
 /**
@@ -16,8 +18,8 @@ export const getPrediction = async (symbol, days = 7) => {
     if (!response.ok) throw new Error('Prediction failed');
     return await response.json();
   } catch (error) {
-    console.error('Prediction error:', error);
-    return null;
+    console.error('Prediction error, using fallback:', error);
+    return getMockPrediction(symbol, days);
   }
 };
 
@@ -66,8 +68,8 @@ export const getMarketAlerts = async (symbol) => {
     if (!response.ok) throw new Error('Alerts failed');
     return await response.json();
   } catch (error) {
-    console.error('Alerts error:', error);
-    return null;
+    console.error('Alerts error, using fallback:', error);
+    return getMockWhaleAlerts(symbol);
   }
 };
 

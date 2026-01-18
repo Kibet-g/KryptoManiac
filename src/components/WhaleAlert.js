@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles, CircularProgress } from '@material-ui/core';
 import GlassCard from './ui/GlassCard';
 
-const ML_API_BASE = process.env.REACT_APP_ML_API_URL || 'http://localhost:8000';
+import { getMarketAlerts } from '../services/MLService';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -138,17 +138,12 @@ const WhaleAlert = ({ symbol }) => {
       if (!symbol) return;
       
       setLoading(true);
-      try {
-        const response = await fetch(`${ML_API_BASE}/api/v1/whales/${symbol}`);
-        if (response.ok) {
-          const data = await response.json();
-          setWhaleData(data);
-        }
-      } catch (err) {
-        console.error('Whale fetch error:', err);
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      const data = await getMarketAlerts(symbol);
+      if (data) {
+        setWhaleData(data);
       }
+      setLoading(false);
     };
 
     fetchWhales();

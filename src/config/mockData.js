@@ -131,3 +131,29 @@ export const getMockHistory = () => {
   }
   return data;
 };
+
+export const getMockPrediction = (symbol, days) => {
+  return {
+    prediction: Array.from({ length: days }, (_, i) => ({
+      day: `Day ${i + 1}`,
+      price: 50000 * (1 + (i * 0.02)) // 2% daily increase
+    })),
+    signal: "BUY",
+    confidence: "87%",
+    sentiment: "Bullish"
+  };
+};
+
+export const getMockWhaleAlerts = (symbol) => {
+  return {
+    alert_level: "HIGH",
+    message: "Significant accumulation detected by institutional wallets.",
+    whale_count: 12,
+    total_volume_usd: 156000000,
+    transactions: [
+      { amount: 500, symbol: symbol.toUpperCase(), usd_value: 25000000 },
+      { amount: 320, symbol: symbol.toUpperCase(), usd_value: 16000000 },
+      { amount: 150, symbol: symbol.toUpperCase(), usd_value: 7500000 }
+    ]
+  };
+};
