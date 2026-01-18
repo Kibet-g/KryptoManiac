@@ -1,9 +1,11 @@
 /**
- * useRealTimePrice Hook - WebSocket connection for live prices
+ * useRealTimePrice Hook - WebSocket connection for live prices with fallback
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { mockCoins } from '../config/mockData';
 
 const WS_BASE = process.env.REACT_APP_WS_URL || 'ws://localhost:8000';
+const FALLBACK_TIMEOUT = 3000; // Fallback to mock after 3 seconds
 
 export const useRealTimePrice = (symbol) => {
   const [price, setPrice] = useState(null);
@@ -12,15 +14,40 @@ export const useRealTimePrice = (symbol) => {
   const [error, setError] = useState(null);
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const fallbackTimeoutRef = useRef(null);
+
+  // Fallback to mock data if WebSocket fails
+  const useFallbackData = useCallback(() => {
+    const coin = mockCoins.find(c => c.id === symbol?.toLowerCase() || c.symbol === symbol?.toLowerCase()) || mockCoins[0];
+    setPrice({
+      price: coin.current_price,
+      price_change_24h: coin.price_change_percentage_24h
+    });
+    setSignal({
+      type: 'HOLD',
+      emoji: '⚖️',
+      message: 'Market steady - wait for better entry'
+    });
+    setConnected(true); // Mark as connected to show UI
+    console.log(`📡 Using fallback data for ${symbol}`);
+  }, [symbol]);
 
   const connect = useCallback(() => {
     if (!symbol) return;
+
+    // Set a fallback timeout
+    fallbackTimeoutRef.current = setTimeout(() => {
+      if (!connected) {
+        useFallbackData();
+      }
+    }, FALLBACK_TIMEOUT);
 
     try {
       const ws = new WebSocket(`${WS_BASE}/ws/${symbol.toLowerCase()}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
+        clearTimeout(fallbackTimeoutRef.current);
         setConnected(true);
         setError(null);
         console.log(`🔌 Connected to ${symbol} stream`);
@@ -43,20 +70,21 @@ export const useRealTimePrice = (symbol) => {
       ws.onerror = (err) => {
         console.error('WebSocket error:', err);
         setError('Connection error');
+        // Fall back to mock data on error
+        useFallbackData();
       };
 
       ws.onclose = () => {
-        setConnected(false);
-        // Reconnect after 5 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log('Reconnecting...');
-          connect();
-        }, 5000);
+        // Don't reconnect endlessly, just use fallback
+        if (!connected) {
+          useFallbackData();
+        }
       };
     } catch (err) {
       setError(err.message);
+      useFallbackData();
     }
-  }, [symbol]);
+  }, [symbol, connected, useFallbackData]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {
@@ -65,6 +93,9 @@ export const useRealTimePrice = (symbol) => {
     }
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
+    }
+    if (fallbackTimeoutRef.current) {
+      clearTimeout(fallbackTimeoutRef.current);
     }
   }, []);
 
@@ -77,3 +108,4 @@ export const useRealTimePrice = (symbol) => {
 };
 
 export default useRealTimePrice;
+

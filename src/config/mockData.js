@@ -132,15 +132,22 @@ export const getMockHistory = () => {
   return data;
 };
 
-export const getMockPrediction = (symbol, days) => {
+export const getMockPrediction = (symbol, days = 7) => {
+  const mockCoin = mockCoins.find(c => c.id === symbol?.toLowerCase() || c.symbol === symbol?.toLowerCase()) || mockCoins[0];
+  const basePrice = mockCoin.current_price;
+  const targetPrice = basePrice * (1 + (Math.random() * 0.1 + 0.02)); // 2-12% increase
+  
   return {
+    symbol: mockCoin.symbol.toUpperCase(),
+    signal: 'BUY',
+    predicted_price: targetPrice,
+    confidence_stars: 4,
+    risk_level: 'MEDIUM',
+    explanation: `Based on technical analysis, ${mockCoin.name} shows strong momentum with positive market sentiment. AI models suggest accumulation within this price range.`,
     prediction: Array.from({ length: days }, (_, i) => ({
       day: `Day ${i + 1}`,
-      price: 50000 * (1 + (i * 0.02)) // 2% daily increase
-    })),
-    signal: "BUY",
-    confidence: "87%",
-    sentiment: "Bullish"
+      price: basePrice * (1 + (i * 0.015))
+    }))
   };
 };
 
