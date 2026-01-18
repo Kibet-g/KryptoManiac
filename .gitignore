@@ -36,3 +36,4 @@ ml-backend/.env
 ml-backend/venv/
 .pytest_cache/
 
+netlify.env
