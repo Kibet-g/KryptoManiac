@@ -1,4 +1,4 @@
-# Crypto Hunter - MERN Stack Web App
+# Crypto Hunter - OPEN SOURCE WEB PLATFORM
 
 
 ![Screenshot (61)](https://github.com/kumarAmar882/crypto_hunting/assets/65217388/41db7772-41b5-41b8-9ca2-eef255853e6e)
